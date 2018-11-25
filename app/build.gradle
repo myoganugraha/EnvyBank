@@ -55,9 +55,11 @@ dependencies {
     //Easy Image
     implementation 'com.github.jkwiecien:EasyImage:1.3.1'
 
-
     //image cropper
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
+
+    //otp layout
+    implementation 'com.chaos.view:pinview:1.4.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

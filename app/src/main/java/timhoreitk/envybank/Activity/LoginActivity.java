@@ -1,123 +1,75 @@
 package timhoreitk.envybank.Activity;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timhoreitk.envybank.API.BaseAPIService;
-import timhoreitk.envybank.API.UtilsAPI;
-import timhoreitk.envybank.Model.LoginModel;
+import timhoreitk.envybank.Fragment.BankLoginFragment;
+import timhoreitk.envybank.Fragment.UserLoginFragment;
 import timhoreitk.envybank.R;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private Context mContext;
+    @BindView(R.id.viewpager)
+    ViewPager viewPager;
 
-    @BindView(R.id.edt_username)
-    EditText usernameLogin;
-
-    @BindView(R.id.edt_password)
-    EditText passwordLogin;
-
-    @BindView(R.id.btn_procedLogin)
-    Button btnProcedLogin;
-
-    @BindView(R.id.btn_goToRegisterPage)
-    Button btnGoToRegisterPage;
-
-    private BaseAPIService baseAPIService;
-    private ProgressDialog progressDialog;
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        
         ButterKnife.bind(this);
-        mContext = this;
-        baseAPIService = UtilsAPI.getAPIService();
+        setupViewPagger(viewPager);
 
-        initLogin();
+        tabLayout.setupWithViewPager(viewPager);
     }
 
-    private void initLogin() {
-        
-        btnProcedLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    private void setupViewPagger(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new UserLoginFragment(), "as User");
+        adapter.addFragment(new BankLoginFragment(), "as Bank");
+        viewPager.setAdapter(adapter);
+    }
 
-                if(usernameLogin.length() < 4 || passwordLogin.length() < 4){
-                    Toast.makeText(mContext, "Bad Credentials", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    progressDialog = ProgressDialog.show(mContext, null, "Please Wait ...", true, false);
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-                    baseAPIService.loginRequest(
-                            new LoginModel(usernameLogin.getText().toString(), passwordLogin.getText().toString()))
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
 
-                            .enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
 
-                                    if(response.isSuccessful()){
-                                        progressDialog.dismiss();
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
 
-                                        try {
-                                            JSONObject jsonObject = new JSONObject(response.body().string());
-                                            JSONArray results = jsonObject.getJSONArray("results");
-                                            JSONObject resultsObject = results.getJSONObject(0);
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
 
-                                            Log.d("User: ", resultsObject.toString());
-                                        }
-
-                                        catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        catch (IOException e) {
-                                            progressDialog.dismiss();
-                                            e.printStackTrace();
-                                        }
-
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    Log.e("error", "onFailure: ERROR > " + t.toString());
-                                }
-                            });
-                }
-            }
-        });
-
-     btnGoToRegisterPage.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View v) {
-             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-             finish();
-         }
-     });
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 
 }

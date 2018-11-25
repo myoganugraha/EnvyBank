@@ -1,10 +1,10 @@
 package timhoreitk.envybank.Model;
 
-public class LoginModel {
+public class UserLoginModel {
     private String username;
     private String password;
 
-    public LoginModel(String username, String password) {
+    public UserLoginModel(String username, String password) {
         this.username = username;
         this.password = password;
     }

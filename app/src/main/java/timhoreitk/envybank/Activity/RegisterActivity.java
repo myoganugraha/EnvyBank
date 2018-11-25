@@ -161,6 +161,11 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
+    @OnClick(R.id.btnGoToUserLogin)
+    public void goLoginPage(){
+        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+    }
+
     @OnClick(R.id.btnSelectImageRegister)
     public void selectImage(){
         EasyImage.openChooserWithGallery(RegisterActivity.this, "Choose Picture", REQUEST_CHOOSE_IMAGE);
